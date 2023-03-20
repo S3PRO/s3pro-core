@@ -1,0 +1,15 @@
+package com.s3procore.dto.validation;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ValidationResultDto {
+
+    private List<ValidationErrorDto> errors;
+}
