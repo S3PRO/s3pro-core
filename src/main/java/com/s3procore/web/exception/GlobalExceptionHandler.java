@@ -5,6 +5,7 @@ import com.s3procore.dto.error.ErrorResultDto;
 import com.s3procore.dto.validation.ValidationErrorDto;
 import com.s3procore.dto.validation.ValidationResultDto;
 import com.s3procore.service.exception.AuthenticationException;
+import com.s3procore.service.exception.EntityAlreadyExistsException;
 import com.s3procore.service.exception.ObjectNotFoundException;
 import com.s3procore.service.exception.RelatedObjectNotFoundException;
 import com.s3procore.service.exception.ValidationException;
@@ -23,6 +24,24 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler({EntityAlreadyExistsException.class})
+    public ResponseEntity<ValidationResultDto> handleValidationException(Exception ex) {
+        List<ValidationErrorDto> errors = null;
+
+        if (ex instanceof ValidationException) {
+            ValidationException validationException = (ValidationException) ex;
+            errors = validationException.getErrors().stream()
+                    .map(error -> new ValidationErrorDto(error.getField(), error.getCode()))
+                    .collect(toList());
+        } else if (ex instanceof EntityAlreadyExistsException) {
+            errors = List.of(new ValidationErrorDto(null, "ENTITY_ALREADY_EXISTS"));
+        }
+
+        ValidationResultDto validationResultDto = new ValidationResultDto(errors);
+
+        return ResponseEntity.badRequest().body(validationResultDto);
+    }
 
     @ExceptionHandler(RelatedObjectNotFoundException.class)
     public ResponseEntity<Object> handleRelatedObjectNotFoundException(RelatedObjectNotFoundException ex) {
@@ -47,7 +66,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler({AuthenticationException.class})
     public ResponseEntity<ErrorResultDto> handleAuthenticationException(AuthenticationException ex) {
         log.error("Authentication exception: [errorCode={}, message={}]", ex.getErrorCode(), ex.getMessage());
 
@@ -58,7 +77,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResultDto);
     }
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler({ValidationException.class})
     public ResponseEntity<ValidationResultDto> handleValidationException(ValidationException ex) {
         List<ValidationErrorDto> errors = ex.getErrors().stream()
                 .map(error -> new ValidationErrorDto(error.getField(), error.getCode()))
