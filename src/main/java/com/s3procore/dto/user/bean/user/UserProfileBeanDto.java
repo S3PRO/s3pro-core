@@ -1,4 +1,4 @@
-package com.s3procore.dto.user.bean;
+package com.s3procore.dto.user.bean.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

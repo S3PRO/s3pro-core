@@ -1,4 +1,4 @@
-package com.s3procore.dto.user.bean;
+package com.s3procore.dto.user.bean.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,10 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserPhoneBeanDto {
+public class UserEmailBeanDto {
 
-    private String phone;
+    private String email;
 
-    private boolean isPhoneVerified;
+    private boolean isEmailVerified;
 
 }

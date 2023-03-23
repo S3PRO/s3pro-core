@@ -1,4 +1,4 @@
-package com.s3procore.dto.user.bean;
+package com.s3procore.dto.user.bean.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

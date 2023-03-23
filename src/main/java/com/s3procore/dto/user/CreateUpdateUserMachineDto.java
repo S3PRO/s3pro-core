@@ -1,5 +1,6 @@
 package com.s3procore.dto.user;
 
+import com.s3procore.model.user.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,20 +10,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateUpdateUserDto {
+public class CreateUpdateUserMachineDto {
 
-    private String email;
+    private Long id;
 
-    private String phoneNumber;
-
-    private String firstName;
-
-    private String lastName;
-
-    private String password;
+    private UserType type;
 
     private String companyName;
 
     private String companySize;
+
+    private String clientId;
+
+    private String secretCode;
 
 }

@@ -2,7 +2,7 @@ package com.s3procore.service.user.converters;
 
 import com.s3procore.core.converter.AbstractConverter;
 import com.s3procore.dto.user.UserDto;
-import com.s3procore.model.User;
+import com.s3procore.model.user.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,5 +22,7 @@ public class UserToDtoConverter extends AbstractConverter<User, UserDto> {
         target.setEmail(source.getEmail());
         target.setPhoneNumber(source.getPhoneNumber());
         target.setLang(source.getLang());
+        target.setCompanyId(source.getCompany().getId());
+        target.setCompanyName(source.getCompany().getName());
     }
 }

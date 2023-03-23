@@ -15,4 +15,8 @@ public class ZitadelProperties {
 
     private String createUserUrl;
 
+    private String createUserMachineUrl;
+
+    private String createSecretUserMachineUrl;
+
 }

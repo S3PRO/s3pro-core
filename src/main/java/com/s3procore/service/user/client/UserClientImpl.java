@@ -1,10 +1,16 @@
 package com.s3procore.service.user.client;
 
 import com.s3procore.dto.user.CreateUpdateUserDto;
-import com.s3procore.dto.user.bean.UserBeanDto;
-import com.s3procore.dto.user.bean.UserBeanResponseDto;
+import com.s3procore.dto.user.CreateUpdateUserMachineDto;
+import com.s3procore.dto.user.UserMachineTokenDto;
+import com.s3procore.dto.user.bean.user.UserBeanDto;
+import com.s3procore.dto.user.bean.user.UserBeanResponseDto;
+import com.s3procore.dto.user.bean.usermachine.SecretUserMachineBeanResponseDto;
+import com.s3procore.dto.user.bean.usermachine.UserBeanMachineDto;
+import com.s3procore.dto.user.bean.usermachine.UserMachineBeanResponseDto;
 import com.s3procore.service.config.ZitadelProperties;
 import com.s3procore.service.user.converters.CreateUpdateUserDtoToUserBeanDtoConverter;
+import com.s3procore.service.user.converters.CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +18,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -22,13 +30,16 @@ public class UserClientImpl implements UserClient {
     private final RestTemplate restTemplate;
     private final ZitadelProperties zitadelProperties;
     private final CreateUpdateUserDtoToUserBeanDtoConverter createUpdateUserDtoToUserBeanDtoConverter;
+    private final CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter createUpdateUserMachineDtoToUserMachineBeanDtoConverter;
 
     public UserClientImpl(RestTemplateBuilder restTemplateBuilder,
                           ZitadelProperties zitadelProperties,
-                          CreateUpdateUserDtoToUserBeanDtoConverter createUpdateUserDtoToUserBeanDtoConverter) {
+                          CreateUpdateUserDtoToUserBeanDtoConverter createUpdateUserDtoToUserBeanDtoConverter,
+                          CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter createUpdateUserMachineDtoToUserMachineBeanDtoConverter) {
         this.restTemplate = restTemplateBuilder.build();
         this.zitadelProperties = zitadelProperties;
         this.createUpdateUserDtoToUserBeanDtoConverter = createUpdateUserDtoToUserBeanDtoConverter;
+        this.createUpdateUserMachineDtoToUserMachineBeanDtoConverter = createUpdateUserMachineDtoToUserMachineBeanDtoConverter;
     }
 
     @Override
@@ -47,10 +58,83 @@ public class UserClientImpl implements UserClient {
         UserBeanResponseDto userBeanResponseDto = responseEntity.getBody();
 
         if (userBeanResponseDto.getUserId() == null) {
-            throw new RuntimeException();//todo
+            throw new RuntimeException();//todo Create rollback process on Zitadel
         }
 
         return userBeanResponseDto;
+    }
+
+    @Override
+    public UserMachineBeanResponseDto createUserMachine(CreateUpdateUserMachineDto createUpdateUserMachineDto) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.set("Authorization", zitadelProperties.getGlobalToken());
+
+        HttpEntity<UserBeanMachineDto> request = new HttpEntity<>(createUpdateUserMachineDtoToUserMachineBeanDtoConverter.convert(createUpdateUserMachineDto), headers);
+
+        String url = String.join("", zitadelProperties.getPrimaryDomain(), zitadelProperties.getCreateUserMachineUrl());
+
+        ResponseEntity<UserMachineBeanResponseDto> responseEntity =
+                restTemplate.exchange(url, HttpMethod.POST, request, UserMachineBeanResponseDto.class);
+
+        UserMachineBeanResponseDto userMachineBeanResponseDto = responseEntity.getBody();
+
+        if (userMachineBeanResponseDto.getUserId() == null) {
+            throw new RuntimeException();//todo Create rollback process on Zitadel
+        }
+
+        SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = createSecretUserMachine(userMachineBeanResponseDto.getUserId());
+        userMachineBeanResponseDto.setClientId(secretUserMachineBeanResponseDto.getClientId());
+        userMachineBeanResponseDto.setClientSecret(secretUserMachineBeanResponseDto.getClientSecret());
+
+        return userMachineBeanResponseDto;
+    }
+
+    @Override
+    public SecretUserMachineBeanResponseDto createSecretUserMachine(String userId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.set("Authorization", zitadelProperties.getGlobalToken());
+
+        HttpEntity<UserBeanMachineDto> request = new HttpEntity<>(headers);
+
+        String url = String.join("", zitadelProperties.getPrimaryDomain(), zitadelProperties.getCreateSecretUserMachineUrl(), userId, "/secret");
+
+        ResponseEntity<SecretUserMachineBeanResponseDto> responseEntity =
+                restTemplate.exchange(url, HttpMethod.PUT, request, SecretUserMachineBeanResponseDto.class);
+
+        SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = responseEntity.getBody();
+
+        if (secretUserMachineBeanResponseDto.getClientId() == null) {
+            throw new RuntimeException();//todo Create rollback process on Zitadel
+        }
+
+        return secretUserMachineBeanResponseDto;
+    }
+
+    @Override
+    public UserMachineTokenDto getUserMachineToken(String clientId, String clientSecret) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Authorization", zitadelProperties.getGlobalToken());
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("grant_type", "client_credentials");
+        map.add("client_id", clientId);
+        map.add("client_secret", clientSecret);
+        map.add("scope", "openid profile email urn:zitadel:iam:org:project:id:zitadel:aud");
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
+
+        ResponseEntity<UserMachineTokenDto> responseEntity =
+                restTemplate.exchange("https://s3pro-dev-01-pnmsfb.zitadel.cloud/oauth/v2/token", HttpMethod.POST, entity,
+                        UserMachineTokenDto.class);
+
+        UserMachineTokenDto userMachineTokenDto = responseEntity.getBody();
+
+        return userMachineTokenDto;
     }
 
 }

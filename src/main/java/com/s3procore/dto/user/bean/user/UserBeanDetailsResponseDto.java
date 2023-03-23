@@ -1,4 +1,4 @@
-package com.s3procore.dto.user.bean;
+package com.s3procore.dto.user.bean.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +17,6 @@ public class UserBeanDetailsResponseDto {
 
     private LocalDateTime creationDate;
 
-    private String  resourceOwner;
+    private String resourceOwner;
 
 }

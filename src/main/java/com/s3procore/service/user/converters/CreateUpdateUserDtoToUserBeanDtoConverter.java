@@ -2,10 +2,10 @@ package com.s3procore.service.user.converters;
 
 import com.s3procore.core.converter.AbstractConverter;
 import com.s3procore.dto.user.CreateUpdateUserDto;
-import com.s3procore.dto.user.bean.UserBeanDto;
-import com.s3procore.dto.user.bean.UserEmailBeanDto;
-import com.s3procore.dto.user.bean.UserPhoneBeanDto;
-import com.s3procore.dto.user.bean.UserProfileBeanDto;
+import com.s3procore.dto.user.bean.user.UserBeanDto;
+import com.s3procore.dto.user.bean.user.UserEmailBeanDto;
+import com.s3procore.dto.user.bean.user.UserPhoneBeanDto;
+import com.s3procore.dto.user.bean.user.UserProfileBeanDto;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;

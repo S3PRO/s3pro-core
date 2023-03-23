@@ -1,9 +1,15 @@
-package com.s3procore.model;
+package com.s3procore.model.user;
 
+import com.s3procore.model.Company;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +33,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String zitadelUserId;
+    @Enumerated(EnumType.STRING)
+    private UserType type;
 
     private String email;
 
@@ -43,6 +50,11 @@ public class User {
 
     private LocalDateTime createdDate;
 
-    private String resourceOwner;
+    private String zitadelUserId;
+
+    private String zitadelResourceOwner;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Company company;
 
 }
