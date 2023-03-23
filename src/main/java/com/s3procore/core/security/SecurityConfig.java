@@ -1,7 +1,5 @@
 package com.s3procore.core.security;
 
-import com.nimbusds.jose.shaded.json.JSONArray;
-import com.nimbusds.jose.shaded.json.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +11,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpMethod.POST;
 
@@ -32,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers(POST, "/api/users").permitAll()
                 .requestMatchers(POST, "/api/user-machines").permitAll()
                 .requestMatchers(POST, "/api/user-machines/generate-token").permitAll()
+//                .requestMatchers(POST, "/api/documents").hasRole("admin")
                 .anyRequest().authenticated()
                 .and()
                     .sessionManagement()
@@ -42,12 +42,13 @@ public class SecurityConfig {
                     .csrf()
                     .disable()
                 .oauth2ResourceServer()
-                .jwt();
+                .jwt()
+                .jwtAuthenticationConverter(jwtAuthenticationConverter());
 
         return httpSecurity.build();
     }
 
-/*    @Bean
+    @Bean
     public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter());
@@ -56,32 +57,20 @@ public class SecurityConfig {
 
     @Bean
     public Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter() {
-        JwtGrantedAuthoritiesConverter delegate = new JwtGrantedAuthoritiesConverter();
-
         return new Converter<>() {
             @Override
             public Collection<GrantedAuthority> convert(Jwt jwt) {
+                Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("urn:zitadel:iam:org:project:roles");
 
-                Collection<GrantedAuthority> grantedAuthorities = delegate.convert(jwt);
-
-                if (jwt.getClaim("realm_access") == null) {
-                    return grantedAuthorities;
+                if (realmAccess.isEmpty()) {
+                    return new ArrayList<>();
                 }
-                JSONObject realmAccess = jwt.getClaim("realm_access");
 
-                if (realmAccess.get("roles") == null) {
-                    return grantedAuthorities;
-                }
-                JSONArray roles = (JSONArray) realmAccess.get("roles");
-
-                final List<SimpleGrantedAuthority> keycloakAuthorities = roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .toList();
-
-                grantedAuthorities.addAll(keycloakAuthorities);
-                return grantedAuthorities;
+                return realmAccess.keySet().stream().map(roleName -> "ROLE_" + roleName)
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
             }
         };
-    }*/
+    }
 
 }
