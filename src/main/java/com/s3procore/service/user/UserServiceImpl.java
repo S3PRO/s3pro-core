@@ -67,9 +67,9 @@ public class UserServiceImpl implements UserService {
 
         UserMachineBeanResponseDto userMachineBeanResponseDto = userClient.createUserMachine(userMachineDto);
 
-        UserMachineTokenDto userMachineTokenDto = userClient.getUserMachineToken(userMachineBeanResponseDto.getClientId(), userMachineBeanResponseDto.getClientSecret());
-
-        userMachineBeanResponseDto.setToken(userMachineTokenDto);
+        /* Generate and return token, it may be deleted */
+//        UserMachineTokenDto userMachineTokenDto = userClient.getUserMachineToken(userMachineBeanResponseDto.getClientId(), userMachineBeanResponseDto.getClientSecret());
+//        userMachineBeanResponseDto.setToken(userMachineTokenDto);
 
         Company company = new Company();
         company.setName(userMachineDto.getCompanyName());
@@ -91,8 +91,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserMachineTokenDto generateUserMachineToken(GenerateUserMachineTokenDto generateUserMachineTokenDto) {
-        UserMachineTokenDto userMachineToken = userClient.getUserMachineToken(generateUserMachineTokenDto.getClientId(), generateUserMachineTokenDto.getClientSecret());
-
-        return userMachineToken;
+        return userClient.getUserMachineToken(generateUserMachineTokenDto.getClientId(), generateUserMachineTokenDto.getClientSecret());
     }
 }
