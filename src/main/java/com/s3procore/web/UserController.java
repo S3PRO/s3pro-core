@@ -5,6 +5,7 @@ import com.s3procore.dto.user.CreateUpdateUserDto;
 import com.s3procore.dto.user.UserDto;
 import com.s3procore.model.user.UserDetails;
 import com.s3procore.service.user.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ public class UserController {
     private final AuthenticationHelper authenticationHelper;
 
     @PostMapping
+    @SecurityRequirements
     public UserDto create(@RequestBody CreateUpdateUserDto userDto) {
         return userService.create(userDto);
     }
