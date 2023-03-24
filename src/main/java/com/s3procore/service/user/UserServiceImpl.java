@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto create(CreateUpdateUserDto userDto) {
         validationService.validate(userDto);
+
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ValidationException(ValidationCodes.USER_ALREADY_EXISTS);
         }
@@ -65,6 +66,10 @@ public class UserServiceImpl implements UserService {
 
         UserMachineBeanResponseDto userMachineBeanResponseDto = userClient.createUserMachine(userMachineDto);
 
+        UserMachineTokenDto userMachineTokenDto = userClient.getUserMachineToken(userMachineBeanResponseDto.getClientId(), userMachineBeanResponseDto.getClientSecret());
+
+        userMachineBeanResponseDto.setToken(userMachineTokenDto);
+
         Company company = new Company();
         company.setName(userMachineDto.getCompanyName());
         company.setSize(userMachineDto.getCompanySize());
@@ -77,11 +82,7 @@ public class UserServiceImpl implements UserService {
         user.setCreatedDate(LocalDateTime.now());
         user.setCompany(company);
 
-        user = userRepository.save(user);
-
-        UserMachineTokenDto userMachineTokenDto = userClient.getUserMachineToken(userMachineBeanResponseDto.getClientId(), userMachineBeanResponseDto.getClientSecret());
-
-        userMachineBeanResponseDto.setToken(userMachineTokenDto);
+        userRepository.save(user);
 
         return userMachineBeanResponseDto;
     }
