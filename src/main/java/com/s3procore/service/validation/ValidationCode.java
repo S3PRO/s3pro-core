@@ -4,8 +4,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ValidationCodes {
+public final class ValidationCode {
     public static final String INVALID_LENGTH = "INVALID_LENGTH";
+    public static final String ZITADEL_API_ERROR = "ZITADEL_API_ERROR";
     public static final String REQUIRED = "REQUIRED";
     public static final String INVALID_PHONE_NUMBER_FORMAT = "INVALID_PHONE_NUMBER_FORMAT";
     public static final String INVALID_EMAIL_FORMAT = "INVALID_EMAIL_FORMAT";

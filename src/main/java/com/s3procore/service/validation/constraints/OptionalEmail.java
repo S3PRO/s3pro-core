@@ -1,6 +1,6 @@
 package com.s3procore.service.validation.constraints;
 
-import com.s3procore.service.validation.ValidationCodes;
+import com.s3procore.service.validation.ValidationCode;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.TYPE, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OptionalEmail {
-    String message() default ValidationCodes.INVALID_ATTRIBUTES;
+    String message() default ValidationCode.INVALID_ATTRIBUTES;
 
     Class<?>[] groups() default {};
 

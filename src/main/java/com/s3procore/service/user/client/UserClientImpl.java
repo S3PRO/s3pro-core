@@ -8,12 +8,12 @@ import com.s3procore.dto.user.bean.user.UserBeanResponseDto;
 import com.s3procore.dto.user.bean.usermachine.SecretUserMachineBeanResponseDto;
 import com.s3procore.dto.user.bean.usermachine.UserBeanMachineDto;
 import com.s3procore.dto.user.bean.usermachine.UserMachineBeanResponseDto;
-import com.s3procore.service.config.ZitadelProperties;
-import com.s3procore.service.constant.ErrorCodes;
+import com.s3procore.service.user.client.config.ZitadelProperties;
 import com.s3procore.service.exception.GenericException;
 import com.s3procore.service.exception.ValidationException;
 import com.s3procore.service.user.converters.CreateUpdateUserDtoToUserBeanDtoConverter;
 import com.s3procore.service.user.converters.CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter;
+import com.s3procore.service.validation.ValidationCode;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -67,7 +67,7 @@ public class UserClientImpl implements UserClient {
 
             return userBeanResponseDto;
         } catch (Exception e) {
-            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
+            throw new GenericException(ValidationCode.ZITADEL_API_ERROR, e.getMessage(), e);
         }
     }
 
@@ -97,7 +97,7 @@ public class UserClientImpl implements UserClient {
 
             return userMachineBeanResponseDto;
         } catch (Exception e) {
-            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
+            throw new GenericException(ValidationCode.ZITADEL_API_ERROR, e.getMessage(), e);
         }
     }
 
@@ -123,7 +123,7 @@ public class UserClientImpl implements UserClient {
 
             return secretUserMachineBeanResponseDto;
         } catch (Exception e) {
-            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
+            throw new GenericException(ValidationCode.ZITADEL_API_ERROR, e.getMessage(), e);
         }
     }
 
@@ -152,7 +152,7 @@ public class UserClientImpl implements UserClient {
 
             return userMachineTokenDto;
         } catch (Exception e) {
-            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
+            throw new GenericException(ValidationCode.ZITADEL_API_ERROR, e.getMessage(), e);
         }
     }
 

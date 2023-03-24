@@ -1,4 +1,4 @@
-package com.s3procore.service.config;
+package com.s3procore.service.user.client.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

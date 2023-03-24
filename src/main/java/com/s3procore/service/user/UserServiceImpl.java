@@ -1,5 +1,6 @@
 package com.s3procore.service.user;
 
+import com.s3procore.core.util.TimeProvider;
 import com.s3procore.dto.user.CreateUpdateUserDto;
 import com.s3procore.dto.user.CreateUpdateUserMachineDto;
 import com.s3procore.dto.user.GenerateUserMachineTokenDto;
@@ -15,7 +16,7 @@ import com.s3procore.service.exception.ValidationException;
 import com.s3procore.service.user.client.UserClient;
 import com.s3procore.service.user.converters.CreateUpdateUserDtoToEntityConverter;
 import com.s3procore.service.user.converters.UserToDtoConverter;
-import com.s3procore.service.validation.ValidationCodes;
+import com.s3procore.service.validation.ValidationCode;
 import com.s3procore.service.validation.ValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final UserClient userClient;
     private final CreateUpdateUserDtoToEntityConverter createUpdateUserDtoToEntityConverter;
     private final UserToDtoConverter userToDtoConverter;
+    private final TimeProvider timeProvider;
 
     @Override
     @Transactional
@@ -40,7 +42,7 @@ public class UserServiceImpl implements UserService {
         validationService.validate(userDto);
 
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
-            throw new ValidationException(ValidationCodes.USER_ALREADY_EXISTS);
+            throw new ValidationException(ValidationCode.USER_ALREADY_EXISTS);
         }
 
         UserBeanResponseDto userBeanResponseDto = userClient.createUser(userDto);
@@ -55,9 +57,7 @@ public class UserServiceImpl implements UserService {
         user.setCreatedDate(userBeanResponseDto.getDetails().getCreationDate());
         user.setCompany(company);
 
-        user = userRepository.save(user);
-
-        return userToDtoConverter.convert(user);
+        return userToDtoConverter.convert(userRepository.save(user));
     }
 
     @Override
@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
         user.setLang(new Locale("en"));
         user.setZitadelUserId(userMachineBeanResponseDto.getUserId());
         user.setZitadelResourceOwner(userMachineBeanResponseDto.getDetails().getResourceOwner());
-        user.setCreatedDate(LocalDateTime.now());
+        user.setCreatedDate(timeProvider.now());
         user.setCompany(company);
 
         userRepository.save(user);

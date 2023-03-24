@@ -1,6 +1,6 @@
 package com.s3procore.dto.user;
 
-import com.s3procore.service.validation.ValidationCodes;
+import com.s3procore.service.validation.ValidationCode;
 import com.s3procore.service.validation.constraints.OptionalEmail;
 import com.s3procore.service.validation.constraints.ValidPhoneNumber;
 import jakarta.validation.constraints.NotNull;
@@ -15,27 +15,27 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateUpdateUserDto {
 
-    @NotNull(message = ValidationCodes.REQUIRED)
-    @OptionalEmail(message = ValidationCodes.INVALID_EMAIL_FORMAT)
+    @NotNull(message = ValidationCode.REQUIRED)
+    @OptionalEmail(message = ValidationCode.INVALID_EMAIL_FORMAT)
     private String email;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     @ValidPhoneNumber
     private String phoneNumber;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     private String firstName;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     private String lastName;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     private String password;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     private String companyName;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     private String companySize;
 
 }

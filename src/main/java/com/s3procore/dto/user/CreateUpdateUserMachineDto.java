@@ -1,6 +1,6 @@
 package com.s3procore.dto.user;
 
-import com.s3procore.service.validation.ValidationCodes;
+import com.s3procore.service.validation.ValidationCode;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +15,10 @@ public class CreateUpdateUserMachineDto {
 
     private Long id;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     private String companyName;
 
-    @NotNull(message = ValidationCodes.REQUIRED)
+    @NotNull(message = ValidationCode.REQUIRED)
     private String companySize;
 
     private String clientId;
