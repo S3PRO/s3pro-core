@@ -1,7 +1,7 @@
 package com.s3procore;
 
-import com.s3procore.core.security.Constants;
-import com.s3procore.core.security.DefaultProfileUtil;
+import com.s3procore.core.security.util.Constants;
+import com.s3procore.core.security.util.DefaultProfileUtil;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

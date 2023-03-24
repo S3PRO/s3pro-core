@@ -14,15 +14,14 @@ import com.s3procore.model.user.UserType;
 import com.s3procore.repository.UserRepository;
 import com.s3procore.service.exception.ValidationException;
 import com.s3procore.service.user.client.UserClient;
-import com.s3procore.service.user.converters.CreateUpdateUserDtoToEntityConverter;
-import com.s3procore.service.user.converters.UserToDtoConverter;
+import com.s3procore.service.user.converter.CreateUpdateUserDtoToEntityConverter;
+import com.s3procore.service.user.converter.UserToDtoConverter;
 import com.s3procore.service.validation.ValidationCode;
 import com.s3procore.service.validation.ValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Service

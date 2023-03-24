@@ -1,4 +1,4 @@
-package com.s3procore.core.security;
+package com.s3procore.core.security.util;
 
 public final class Constants {
 

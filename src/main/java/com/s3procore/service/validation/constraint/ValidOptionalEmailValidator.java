@@ -1,4 +1,4 @@
-package com.s3procore.service.validation.constraints;
+package com.s3procore.service.validation.constraint;
 
 import org.apache.commons.validator.routines.EmailValidator;
 

@@ -1,8 +1,8 @@
 package com.s3procore.dto.user;
 
 import com.s3procore.service.validation.ValidationCode;
-import com.s3procore.service.validation.constraints.OptionalEmail;
-import com.s3procore.service.validation.constraints.ValidPhoneNumber;
+import com.s3procore.service.validation.constraint.OptionalEmail;
+import com.s3procore.service.validation.constraint.ValidPhoneNumber;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

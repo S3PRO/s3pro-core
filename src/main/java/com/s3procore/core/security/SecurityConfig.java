@@ -1,6 +1,7 @@
 package com.s3procore.core.security;
 
 import com.google.common.collect.ObjectArrays;
+import com.s3procore.core.security.util.DefaultProfileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -49,25 +50,24 @@ public class SecurityConfig {
             "/actuator/**"
     };
 
-    private String SIGNUP_USER_PATH = "/api/users";
-    private String SIGNUP_USER_MACHINE_PATH = "/api/user-machines";
-    private String GENERATE_TOKEN_USER_MACHINE_PATH = "/api/user-machines";
+    private final String SIGNUP_USER_PATH = "/api/users";
+    private final String SIGNUP_USER_MACHINE_PATH = "/api/user-machines";
+    private final String GENERATE_TOKEN_USER_MACHINE_PATH = "/api/user-machines";
 
 
     @Bean
     public SecurityFilterChain securityChain(HttpSecurity httpSecurity) throws Exception {
-
-        httpSecurity.authorizeRequests()
+        httpSecurity.authorizeHttpRequests()
                 .requestMatchers(getPublicRoutes()).permitAll()
+                .requestMatchers(MONITORING_PATHS).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .cors()
+                .cors()
                 .and()
-                    .csrf()
-                    .disable()
+                .csrf().disable()
                 .oauth2ResourceServer()
                 .jwt()
                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
@@ -102,7 +102,6 @@ public class SecurityConfig {
 
     @Bean
     public CorsFilter corsFilter() {
-
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
 
@@ -122,7 +121,6 @@ public class SecurityConfig {
      * Swagger routes allowed only on dev and stage or default profile
      */
     private String[] getPublicRoutes() {
-
         final Environment env = applicationContext.getEnvironment();
         final boolean isProd = DefaultProfileUtil.isProdProfile(env);
 

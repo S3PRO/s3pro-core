@@ -4,7 +4,7 @@ import com.s3procore.core.security.AuthenticationHelper;
 import com.s3procore.dto.document.DocumentDto;
 import com.s3procore.model.Company;
 import com.s3procore.model.Document;
-import com.s3procore.model.user.UserDetails;
+import com.s3procore.model.user.UserDetail;
 import com.s3procore.repository.CompanyRepository;
 import com.s3procore.repository.DocumentRepository;
 import com.s3procore.service.document.converter.DocumentToDtoConverter;
@@ -25,10 +25,10 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public DocumentDto create(DocumentDto documentDto) {
-        UserDetails userDetails = authenticationHelper.getAuthenticationDetails();
+        UserDetail userDetail = authenticationHelper.getAuthenticationDetails();
 
-        Company company = companyRepository.findById(userDetails.getCompanyId())
-                .orElseThrow(() -> new RelatedObjectNotFoundException(userDetails.getCompanyId(), Company.class));
+        Company company = companyRepository.findById(userDetail.getCompanyId())
+                .orElseThrow(() -> new RelatedObjectNotFoundException(userDetail.getCompanyId(), Company.class));
 
         documentDto.setId(null);
 

@@ -1,4 +1,4 @@
-package com.s3procore.service.user.converters;
+package com.s3procore.service.user.converter;
 
 import com.s3procore.core.converter.AbstractConverter;
 import com.s3procore.dto.user.UserMachineDto;

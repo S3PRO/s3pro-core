@@ -11,12 +11,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info =@Info(
+        info = @Info(
                 title = "S3Pro API",
                 version = "0.0.1"
         )
 )
-public class OpenAPISecurityConfiguration {
+public class OpenAPISecurityConfig {
 
     @Bean
     public OpenAPI customizeOpenAPI() {

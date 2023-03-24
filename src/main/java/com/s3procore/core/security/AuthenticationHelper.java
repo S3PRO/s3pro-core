@@ -1,7 +1,7 @@
 package com.s3procore.core.security;
 
 import com.s3procore.model.user.User;
-import com.s3procore.model.user.UserDetails;
+import com.s3procore.model.user.UserDetail;
 import com.s3procore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -14,14 +14,14 @@ public class AuthenticationHelper {
 
     private final UserRepository userRepository;
 
-    public UserDetails getAuthenticationDetails() {
+    public UserDetail getAuthenticationDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String pid = authentication.getName();
 
         User user = userRepository.findByZitadelUserId(pid)
                 .orElseThrow(() -> new IllegalStateException("Couldn't get user details due to user is not authenticated or not exist"));
 
-        return UserDetails.builder()
+        return UserDetail.builder()
                 .id(user.getId())
                 .companyId(user.getCompany().getId())
                 .build();
