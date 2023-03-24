@@ -20,7 +20,7 @@ public class UserMachineController {
 
     @PostMapping
     public UserMachineBeanResponseDto create(@RequestBody CreateUpdateUserMachineDto userMachineDto) {
-       return userService.createUserMachine(userMachineDto);
+        return userService.createUserMachine(userMachineDto);
     }
 
     @PostMapping("/generate-token")

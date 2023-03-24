@@ -63,6 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserMachineBeanResponseDto createUserMachine(CreateUpdateUserMachineDto userMachineDto) {
+        validationService.validate(userMachineDto);
 
         UserMachineBeanResponseDto userMachineBeanResponseDto = userClient.createUserMachine(userMachineDto);
 
