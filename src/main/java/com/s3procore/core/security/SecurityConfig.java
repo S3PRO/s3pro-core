@@ -62,7 +62,7 @@ public class SecurityConfig {
             public Collection<GrantedAuthority> convert(Jwt jwt) {
                 Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("urn:zitadel:iam:org:project:roles");
 
-                if (realmAccess.isEmpty()) {
+                if (realmAccess == null) {
                     return new ArrayList<>();
                 }
 

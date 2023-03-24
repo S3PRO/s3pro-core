@@ -6,6 +6,7 @@ import com.s3procore.dto.validation.ValidationErrorDto;
 import com.s3procore.dto.validation.ValidationResultDto;
 import com.s3procore.service.exception.AuthenticationException;
 import com.s3procore.service.exception.EntityAlreadyExistsException;
+import com.s3procore.service.exception.GenericException;
 import com.s3procore.service.exception.ObjectNotFoundException;
 import com.s3procore.service.exception.RelatedObjectNotFoundException;
 import com.s3procore.service.exception.ValidationException;
@@ -84,5 +85,16 @@ public class GlobalExceptionHandler {
                 .collect(toList());
         ValidationResultDto validationResultDto = new ValidationResultDto(errors);
         return ResponseEntity.badRequest().body(validationResultDto);
+    }
+
+    @ExceptionHandler(GenericException.class)
+    public ResponseEntity<ErrorResultDto> handleGenericException(GenericException ex) {
+        log.error("Generic exception [errorCode={}, details={}]", ex.getErrorCode(), ex.getDetails());
+
+        List<ErrorDto> errors = List.of(new ErrorDto(ex.getErrorCode(), ex.getDetails()));
+
+        ErrorResultDto errorResultDto = new ErrorResultDto(errors);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResultDto);
     }
 }

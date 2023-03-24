@@ -9,6 +9,9 @@ import com.s3procore.dto.user.bean.usermachine.SecretUserMachineBeanResponseDto;
 import com.s3procore.dto.user.bean.usermachine.UserBeanMachineDto;
 import com.s3procore.dto.user.bean.usermachine.UserMachineBeanResponseDto;
 import com.s3procore.service.config.ZitadelProperties;
+import com.s3procore.service.constant.ErrorCodes;
+import com.s3procore.service.exception.GenericException;
+import com.s3procore.service.exception.ValidationException;
 import com.s3procore.service.user.converters.CreateUpdateUserDtoToUserBeanDtoConverter;
 import com.s3procore.service.user.converters.CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -52,16 +55,20 @@ public class UserClientImpl implements UserClient {
 
         String url = String.join("", zitadelProperties.getPrimaryDomain(), zitadelProperties.getCreateUserUrl());
 
-        ResponseEntity<UserBeanResponseDto> responseEntity =
-                restTemplate.exchange(url, HttpMethod.POST, request, UserBeanResponseDto.class);
+        try {
+            ResponseEntity<UserBeanResponseDto> responseEntity =
+                    restTemplate.exchange(url, HttpMethod.POST, request, UserBeanResponseDto.class);
 
-        UserBeanResponseDto userBeanResponseDto = responseEntity.getBody();
+            UserBeanResponseDto userBeanResponseDto = responseEntity.getBody();
 
-        if (userBeanResponseDto.getUserId() == null) {
-            throw new RuntimeException();//todo Create rollback process on Zitadel
+            if (userBeanResponseDto.getUserId() == null) {
+                throw new ValidationException("ZITADEL_USER_ID_ERROR");
+            }
+
+            return userBeanResponseDto;
+        } catch (Exception e) {
+            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
         }
-
-        return userBeanResponseDto;
     }
 
     @Override
@@ -74,20 +81,24 @@ public class UserClientImpl implements UserClient {
 
         String url = String.join("", zitadelProperties.getPrimaryDomain(), zitadelProperties.getCreateUserMachineUrl());
 
-        ResponseEntity<UserMachineBeanResponseDto> responseEntity =
-                restTemplate.exchange(url, HttpMethod.POST, request, UserMachineBeanResponseDto.class);
+        try {
+            ResponseEntity<UserMachineBeanResponseDto> responseEntity =
+                    restTemplate.exchange(url, HttpMethod.POST, request, UserMachineBeanResponseDto.class);
 
-        UserMachineBeanResponseDto userMachineBeanResponseDto = responseEntity.getBody();
+            UserMachineBeanResponseDto userMachineBeanResponseDto = responseEntity.getBody();
 
-        if (userMachineBeanResponseDto.getUserId() == null) {
-            throw new RuntimeException();//todo Create rollback process on Zitadel
+            if (userMachineBeanResponseDto.getUserId() == null) {
+                throw new ValidationException("ZITADEL_USER_ID_ERROR");
+            }
+
+            SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = createSecretUserMachine(userMachineBeanResponseDto.getUserId());
+            userMachineBeanResponseDto.setClientId(secretUserMachineBeanResponseDto.getClientId());
+            userMachineBeanResponseDto.setClientSecret(secretUserMachineBeanResponseDto.getClientSecret());
+
+            return userMachineBeanResponseDto;
+        } catch (Exception e) {
+            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
         }
-
-        SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = createSecretUserMachine(userMachineBeanResponseDto.getUserId());
-        userMachineBeanResponseDto.setClientId(secretUserMachineBeanResponseDto.getClientId());
-        userMachineBeanResponseDto.setClientSecret(secretUserMachineBeanResponseDto.getClientSecret());
-
-        return userMachineBeanResponseDto;
     }
 
     @Override
@@ -100,16 +111,20 @@ public class UserClientImpl implements UserClient {
 
         String url = String.join("", zitadelProperties.getPrimaryDomain(), zitadelProperties.getCreateSecretUserMachineUrl(), userId, "/secret");
 
-        ResponseEntity<SecretUserMachineBeanResponseDto> responseEntity =
-                restTemplate.exchange(url, HttpMethod.PUT, request, SecretUserMachineBeanResponseDto.class);
+        try {
+            ResponseEntity<SecretUserMachineBeanResponseDto> responseEntity =
+                    restTemplate.exchange(url, HttpMethod.PUT, request, SecretUserMachineBeanResponseDto.class);
 
-        SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = responseEntity.getBody();
+            SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = responseEntity.getBody();
 
-        if (secretUserMachineBeanResponseDto.getClientId() == null) {
-            throw new RuntimeException();//todo Create rollback process on Zitadel
+            if (secretUserMachineBeanResponseDto.getClientId() == null) {
+                throw new ValidationException("ZITADEL_CLIENT_ID_ERROR");
+            }
+
+            return secretUserMachineBeanResponseDto;
+        } catch (Exception e) {
+            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
         }
-
-        return secretUserMachineBeanResponseDto;
     }
 
     @Override
@@ -128,13 +143,17 @@ public class UserClientImpl implements UserClient {
 
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
-        ResponseEntity<UserMachineTokenDto> responseEntity =
-                restTemplate.exchange("https://s3pro-dev-01-pnmsfb.zitadel.cloud/oauth/v2/token", HttpMethod.POST, entity,
-                        UserMachineTokenDto.class);
+        try {
+            ResponseEntity<UserMachineTokenDto> responseEntity =
+                    restTemplate.exchange("https://s3pro-dev-01-pnmsfb.zitadel.cloud/oauth/v2/token", HttpMethod.POST, entity,
+                            UserMachineTokenDto.class);
 
-        UserMachineTokenDto userMachineTokenDto = responseEntity.getBody();
+            UserMachineTokenDto userMachineTokenDto = responseEntity.getBody();
 
-        return userMachineTokenDto;
+            return userMachineTokenDto;
+        } catch (Exception e) {
+            throw new GenericException(ErrorCodes.ZITADEL_API_ERROR, e.getMessage(), e);
+        }
     }
 
 }
