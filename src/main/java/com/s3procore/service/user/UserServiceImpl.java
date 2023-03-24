@@ -11,10 +11,12 @@ import com.s3procore.model.Company;
 import com.s3procore.model.user.User;
 import com.s3procore.model.user.UserType;
 import com.s3procore.repository.UserRepository;
-import com.s3procore.service.exception.EntityAlreadyExistsException;
+import com.s3procore.service.exception.ValidationException;
 import com.s3procore.service.user.client.UserClient;
 import com.s3procore.service.user.converters.CreateUpdateUserDtoToEntityConverter;
 import com.s3procore.service.user.converters.UserToDtoConverter;
+import com.s3procore.service.validation.ValidationCodes;
+import com.s3procore.service.validation.ValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ import java.util.Locale;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final ValidationService validationService;
     private final UserClient userClient;
     private final CreateUpdateUserDtoToEntityConverter createUpdateUserDtoToEntityConverter;
     private final UserToDtoConverter userToDtoConverter;
@@ -34,8 +37,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto create(CreateUpdateUserDto userDto) {
+        validationService.validate(userDto);
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
-            throw new EntityAlreadyExistsException("User already exists!");
+            throw new ValidationException(ValidationCodes.USER_ALREADY_EXISTS);
         }
 
         UserBeanResponseDto userBeanResponseDto = userClient.createUser(userDto);
