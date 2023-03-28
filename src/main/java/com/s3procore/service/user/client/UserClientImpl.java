@@ -1,18 +1,18 @@
 package com.s3procore.service.user.client;
 
+import com.s3procore.dto.application.CreateApplicationDto;
 import com.s3procore.dto.user.CreateUpdateUserDto;
-import com.s3procore.dto.user.CreateUpdateUserMachineDto;
-import com.s3procore.dto.user.UserMachineTokenDto;
+import com.s3procore.dto.user.ApplicationTokenDto;
 import com.s3procore.dto.user.bean.user.UserBeanDto;
 import com.s3procore.dto.user.bean.user.UserBeanResponseDto;
-import com.s3procore.dto.user.bean.usermachine.SecretUserMachineBeanResponseDto;
-import com.s3procore.dto.user.bean.usermachine.UserBeanMachineDto;
-import com.s3procore.dto.user.bean.usermachine.UserMachineBeanResponseDto;
+import com.s3procore.dto.user.bean.usermachine.SecretApplicationBeanResponseDto;
+import com.s3procore.dto.user.bean.usermachine.ApplicationBeanDto;
+import com.s3procore.dto.user.bean.usermachine.ApplicationBeanResponseDto;
 import com.s3procore.service.user.client.config.ZitadelProperties;
 import com.s3procore.service.exception.GenericException;
 import com.s3procore.service.exception.ValidationException;
 import com.s3procore.service.user.converter.CreateUpdateUserDtoToUserBeanDtoConverter;
-import com.s3procore.service.user.converter.CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter;
+import com.s3procore.service.application.converter.CreateApplicationDtoToApplicationBeanDtoConverter;
 import com.s3procore.service.validation.ValidationCode;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -33,16 +33,16 @@ public class UserClientImpl implements UserClient {
     private final RestTemplate restTemplate;
     private final ZitadelProperties zitadelProperties;
     private final CreateUpdateUserDtoToUserBeanDtoConverter createUpdateUserDtoToUserBeanDtoConverter;
-    private final CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter createUpdateUserMachineDtoToUserMachineBeanDtoConverter;
+    private final CreateApplicationDtoToApplicationBeanDtoConverter createApplicationDtoToApplicationBeanDtoConverter;
 
     public UserClientImpl(RestTemplateBuilder restTemplateBuilder,
                           ZitadelProperties zitadelProperties,
                           CreateUpdateUserDtoToUserBeanDtoConverter createUpdateUserDtoToUserBeanDtoConverter,
-                          CreateUpdateUserMachineDtoToUserMachineBeanDtoConverter createUpdateUserMachineDtoToUserMachineBeanDtoConverter) {
+                          CreateApplicationDtoToApplicationBeanDtoConverter createApplicationDtoToApplicationBeanDtoConverter) {
         this.restTemplate = restTemplateBuilder.build();
         this.zitadelProperties = zitadelProperties;
         this.createUpdateUserDtoToUserBeanDtoConverter = createUpdateUserDtoToUserBeanDtoConverter;
-        this.createUpdateUserMachineDtoToUserMachineBeanDtoConverter = createUpdateUserMachineDtoToUserMachineBeanDtoConverter;
+        this.createApplicationDtoToApplicationBeanDtoConverter = createApplicationDtoToApplicationBeanDtoConverter;
     }
 
     @Override
@@ -72,63 +72,63 @@ public class UserClientImpl implements UserClient {
     }
 
     @Override
-    public UserMachineBeanResponseDto createUserMachine(CreateUpdateUserMachineDto createUpdateUserMachineDto) {
+    public ApplicationBeanResponseDto createApplication(CreateApplicationDto createApplicationDto) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.set("Authorization", zitadelProperties.getGlobalToken());
 
-        HttpEntity<UserBeanMachineDto> request = new HttpEntity<>(createUpdateUserMachineDtoToUserMachineBeanDtoConverter.convert(createUpdateUserMachineDto), headers);
+        HttpEntity<ApplicationBeanDto> request = new HttpEntity<>(createApplicationDtoToApplicationBeanDtoConverter.convert(createApplicationDto), headers);
 
         String url = String.join("", zitadelProperties.getPrimaryDomain(), zitadelProperties.getCreateUserMachineUrl());
 
         try {
-            ResponseEntity<UserMachineBeanResponseDto> responseEntity =
-                    restTemplate.exchange(url, HttpMethod.POST, request, UserMachineBeanResponseDto.class);
+            ResponseEntity<ApplicationBeanResponseDto> responseEntity =
+                    restTemplate.exchange(url, HttpMethod.POST, request, ApplicationBeanResponseDto.class);
 
-            UserMachineBeanResponseDto userMachineBeanResponseDto = responseEntity.getBody();
+            ApplicationBeanResponseDto applicationBeanResponseDto = responseEntity.getBody();
 
-            if (userMachineBeanResponseDto.getUserId() == null) {
+            if (applicationBeanResponseDto.getUserId() == null) {
                 throw new ValidationException("ZITADEL_USER_ID_ERROR");
             }
 
-            SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = createSecretUserMachine(userMachineBeanResponseDto.getUserId());
-            userMachineBeanResponseDto.setClientId(secretUserMachineBeanResponseDto.getClientId());
-            userMachineBeanResponseDto.setClientSecret(secretUserMachineBeanResponseDto.getClientSecret());
+            SecretApplicationBeanResponseDto secretApplicationBeanResponseDto = createApplicationSecretCredentials(applicationBeanResponseDto.getUserId());
+            applicationBeanResponseDto.setClientId(secretApplicationBeanResponseDto.getClientId());
+            applicationBeanResponseDto.setClientSecret(secretApplicationBeanResponseDto.getClientSecret());
 
-            return userMachineBeanResponseDto;
+            return applicationBeanResponseDto;
         } catch (Exception e) {
             throw new GenericException(ValidationCode.ZITADEL_API_ERROR, e.getMessage(), e);
         }
     }
 
     @Override
-    public SecretUserMachineBeanResponseDto createSecretUserMachine(String userId) {
+    public SecretApplicationBeanResponseDto createApplicationSecretCredentials(String userId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.set("Authorization", zitadelProperties.getGlobalToken());
 
-        HttpEntity<UserBeanMachineDto> request = new HttpEntity<>(headers);
+        HttpEntity<ApplicationBeanDto> request = new HttpEntity<>(headers);
 
         String url = String.join("", zitadelProperties.getPrimaryDomain(), zitadelProperties.getCreateSecretUserMachineUrl(), userId, "/secret");
 
         try {
-            ResponseEntity<SecretUserMachineBeanResponseDto> responseEntity =
-                    restTemplate.exchange(url, HttpMethod.PUT, request, SecretUserMachineBeanResponseDto.class);
+            ResponseEntity<SecretApplicationBeanResponseDto> responseEntity =
+                    restTemplate.exchange(url, HttpMethod.PUT, request, SecretApplicationBeanResponseDto.class);
 
-            SecretUserMachineBeanResponseDto secretUserMachineBeanResponseDto = responseEntity.getBody();
+            SecretApplicationBeanResponseDto secretApplicationBeanResponseDto = responseEntity.getBody();
 
-            if (secretUserMachineBeanResponseDto.getClientId() == null) {
+            if (secretApplicationBeanResponseDto.getClientId() == null) {
                 throw new ValidationException("ZITADEL_CLIENT_ID_ERROR");
             }
 
-            return secretUserMachineBeanResponseDto;
+            return secretApplicationBeanResponseDto;
         } catch (Exception e) {
             throw new GenericException(ValidationCode.ZITADEL_API_ERROR, e.getMessage(), e);
         }
     }
 
     @Override
-    public UserMachineTokenDto getUserMachineToken(String clientId, String clientSecret) {
+    public ApplicationTokenDto getApplicationToken(String clientId, String clientSecret) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -144,13 +144,13 @@ public class UserClientImpl implements UserClient {
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
         try {
-            ResponseEntity<UserMachineTokenDto> responseEntity =
+            ResponseEntity<ApplicationTokenDto> responseEntity =
                     restTemplate.exchange("https://s3pro-dev-01-pnmsfb.zitadel.cloud/oauth/v2/token", HttpMethod.POST, entity,
-                            UserMachineTokenDto.class);
+                            ApplicationTokenDto.class);
 
-            UserMachineTokenDto userMachineTokenDto = responseEntity.getBody();
+            ApplicationTokenDto applicationTokenDto = responseEntity.getBody();
 
-            return userMachineTokenDto;
+            return applicationTokenDto;
         } catch (Exception e) {
             throw new GenericException(ValidationCode.ZITADEL_API_ERROR, e.getMessage(), e);
         }

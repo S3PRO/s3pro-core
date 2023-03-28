@@ -4,6 +4,6 @@ import com.s3procore.dto.document.DocumentDto;
 
 public interface DocumentService {
 
-    DocumentDto create(DocumentDto documentDto);
+    DocumentDto create(String domainName, DocumentDto documentDto);
 
 }

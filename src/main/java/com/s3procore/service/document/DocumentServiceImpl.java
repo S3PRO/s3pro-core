@@ -2,11 +2,11 @@ package com.s3procore.service.document;
 
 import com.s3procore.core.security.AuthenticationHelper;
 import com.s3procore.dto.document.DocumentDto;
-import com.s3procore.model.Company;
+import com.s3procore.dto.security.AuthenticationDetailsDto;
 import com.s3procore.model.Document;
-import com.s3procore.model.user.UserDetail;
-import com.s3procore.repository.CompanyRepository;
+import com.s3procore.model.tenant.Tenant;
 import com.s3procore.repository.DocumentRepository;
+import com.s3procore.repository.TenantRepository;
 import com.s3procore.service.document.converter.DocumentToDtoConverter;
 import com.s3procore.service.exception.RelatedObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -18,23 +18,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentRepository documentRepository;
-    private final CompanyRepository companyRepository;
+    private final TenantRepository tenantRepository;
     private final AuthenticationHelper authenticationHelper;
     private final DocumentToDtoConverter documentToDtoConverter;
 
     @Override
     @Transactional
-    public DocumentDto create(DocumentDto documentDto) {
-        UserDetail userDetail = authenticationHelper.getAuthenticationDetails();
+    public DocumentDto create(String domainName, DocumentDto documentDto) {
+        AuthenticationDetailsDto authenticationDetails = authenticationHelper.getAuthenticationDetailsByDomainName(domainName);
 
-        Company company = companyRepository.findById(userDetail.getCompanyId())
-                .orElseThrow(() -> new RelatedObjectNotFoundException(userDetail.getCompanyId(), Company.class));
+        Tenant tenant = tenantRepository.findById(authenticationDetails.getTenantId())
+                .orElseThrow(() -> new RelatedObjectNotFoundException(domainName, Tenant.class));
 
         documentDto.setId(null);
 
         Document document = new Document();
         document.setName(documentDto.getName());
-        document.setCompany(company);
+        document.setTenant(tenant);
 
         document = documentRepository.save(document);
 

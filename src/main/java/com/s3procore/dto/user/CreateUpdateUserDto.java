@@ -32,10 +32,4 @@ public class CreateUpdateUserDto {
     @NotNull(message = ValidationCode.REQUIRED)
     private String password;
 
-    @NotNull(message = ValidationCode.REQUIRED)
-    private String companyName;
-
-    @NotNull(message = ValidationCode.REQUIRED)
-    private String companySize;
-
 }

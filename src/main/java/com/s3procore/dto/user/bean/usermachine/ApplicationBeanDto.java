@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBeanMachineDto {
+public class ApplicationBeanDto {
 
     private String userName;
 

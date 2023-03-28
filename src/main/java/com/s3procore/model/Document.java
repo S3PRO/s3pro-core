@@ -1,5 +1,6 @@
 package com.s3procore.model;
 
+import com.s3procore.model.tenant.Tenant;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +17,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "documents")
@@ -30,6 +29,6 @@ public class Document {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Company company;
+    private Tenant tenant;
 
 }

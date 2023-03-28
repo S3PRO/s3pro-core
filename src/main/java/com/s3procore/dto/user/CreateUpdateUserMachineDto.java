@@ -18,9 +18,6 @@ public class CreateUpdateUserMachineDto {
     @NotNull(message = ValidationCode.REQUIRED)
     private String companyName;
 
-    @NotNull(message = ValidationCode.REQUIRED)
-    private String companySize;
-
     private String clientId;
 
     private String secretCode;

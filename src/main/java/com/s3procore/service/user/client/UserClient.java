@@ -1,20 +1,20 @@
 package com.s3procore.service.user.client;
 
+import com.s3procore.dto.application.CreateApplicationDto;
 import com.s3procore.dto.user.CreateUpdateUserDto;
-import com.s3procore.dto.user.CreateUpdateUserMachineDto;
-import com.s3procore.dto.user.UserMachineTokenDto;
+import com.s3procore.dto.user.ApplicationTokenDto;
 import com.s3procore.dto.user.bean.user.UserBeanResponseDto;
-import com.s3procore.dto.user.bean.usermachine.SecretUserMachineBeanResponseDto;
-import com.s3procore.dto.user.bean.usermachine.UserMachineBeanResponseDto;
+import com.s3procore.dto.user.bean.usermachine.SecretApplicationBeanResponseDto;
+import com.s3procore.dto.user.bean.usermachine.ApplicationBeanResponseDto;
 
 public interface UserClient {
 
     UserBeanResponseDto createUser(CreateUpdateUserDto createUpdateUserDto);
 
-    UserMachineBeanResponseDto createUserMachine(CreateUpdateUserMachineDto createUpdateUserMachineDto);
+    ApplicationBeanResponseDto createApplication(CreateApplicationDto createApplicationDto);
 
-    SecretUserMachineBeanResponseDto createSecretUserMachine(String userId);
+    SecretApplicationBeanResponseDto createApplicationSecretCredentials(String userId);
 
-    UserMachineTokenDto getUserMachineToken(String clientId, String clientSecret);
+    ApplicationTokenDto getApplicationToken(String clientId, String clientSecret);
 
 }

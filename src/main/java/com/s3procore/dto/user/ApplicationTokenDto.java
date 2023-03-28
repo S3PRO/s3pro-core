@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserMachineTokenDto {
+public class ApplicationTokenDto {
 
     @JsonProperty("access_token")
     private String accessToken;

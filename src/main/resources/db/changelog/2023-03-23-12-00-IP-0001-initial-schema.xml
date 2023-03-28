@@ -8,31 +8,43 @@
 
     <changeSet id="IP-0001-initial-schema" author="amanivchuk">
         <sql>
-            CREATE TABLE companies (
+            CREATE TABLE tenants (
                 id BIGSERIAL NOT NULL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                size VARCHAR(255) NOT NULL
+                domain_name VARCHAR(255) NOT NULL,
+                location VARCHAR(100) NOT NULL,
+                environment VARCHAR(100) NOT NULL
             );
 
             CREATE TABLE users (
                 id BIGSERIAL NOT NULL PRIMARY KEY,
-                type VARCHAR(50) NOT NULL,
                 email VARCHAR(255),
-                user_name VARCHAR(255),
                 first_name VARCHAR(255),
                 last_name VARCHAR(255),
                 phone_number VARCHAR(255),
-                lang VARCHAR(255) NOT NULL,
                 created_date TIMESTAMP NOT NULL,
-                zitadel_user_id VARCHAR(255) NOT NULL,
-                zitadel_resource_owner VARCHAR(255) NOT NULL,
-                company_id bigint NOT NULL references companies(id)
+                sub_id VARCHAR(255) NOT NULL
+            );
+
+            CREATE TABLE tenant_user (
+                tenant_id bigint references tenants(id),
+                user_id bigint references users(id)
             );
 
             CREATE TABLE documents (
                 id BIGSERIAL NOT NULL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
-                company_id bigint NOT NULL references companies(id)
+                tenant_id bigint NOT NULL references tenants(id)
+            );
+
+            CREATE TABLE applications (
+                id BIGSERIAL NOT NULL PRIMARY KEY,
+                application_name VARCHAR(255) NOT NULL,
+                application_type VARCHAR(100) NOT NULL,
+                sub_id VARCHAR(100) NOT NULL,
+                client_id VARCHAR(255),
+                client_secret VARCHAR(255),
+                application_grant_type VARCHAR(100),
+                tenant_id bigint NOT NULL references tenants(id)
             );
 
         </sql>

@@ -16,13 +16,9 @@ public class UserToDtoConverter extends AbstractConverter<User, UserDto> {
     @Override
     public void convert(User source, UserDto target) {
         target.setId(source.getId());
-        target.setUserName(source.getUserName());
         target.setFirstName(source.getFirstName());
         target.setLastName(source.getLastName());
         target.setEmail(source.getEmail());
         target.setPhoneNumber(source.getPhoneNumber());
-        target.setLang(source.getLang());
-        target.setCompanyId(source.getCompany().getId());
-        target.setCompanyName(source.getCompany().getName());
     }
 }
