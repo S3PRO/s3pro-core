@@ -16,9 +16,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,9 +32,10 @@ import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
+    private final AuthenticationFilter authenticationFilter;
 
     private static final String[] SWAGGER_PATHS = {
             // -- swagger ui
@@ -65,6 +69,7 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .cors()
                 .and()
                 .csrf().disable()
@@ -132,5 +137,15 @@ public class SecurityConfig {
             return ObjectArrays.concat(SWAGGER_PATHS, authPaths, String.class);
         }
 
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authenticationSecurityInterceptor());
+    }
+
+    @Bean
+    public AuthenticationSecurityInterceptor authenticationSecurityInterceptor() {
+        return new AuthenticationSecurityInterceptor();
     }
 }

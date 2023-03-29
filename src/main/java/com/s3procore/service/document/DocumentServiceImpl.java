@@ -9,6 +9,7 @@ import com.s3procore.repository.DocumentRepository;
 import com.s3procore.repository.TenantRepository;
 import com.s3procore.service.document.converter.DocumentToDtoConverter;
 import com.s3procore.service.exception.RelatedObjectNotFoundException;
+import com.s3procore.service.validation.ValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,13 @@ public class DocumentServiceImpl implements DocumentService {
     private final TenantRepository tenantRepository;
     private final AuthenticationHelper authenticationHelper;
     private final DocumentToDtoConverter documentToDtoConverter;
+    private final ValidationService validationService;
 
     @Override
     @Transactional
     public DocumentDto create(String domainName, DocumentDto documentDto) {
+        validationService.validate(documentDto);
+
         AuthenticationDetailsDto authenticationDetails = authenticationHelper.getAuthenticationDetailsByDomainName(domainName);
 
         Tenant tenant = tenantRepository.findById(authenticationDetails.getTenantId())

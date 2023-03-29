@@ -12,5 +12,6 @@ public final class ValidationCode {
     public static final String INVALID_EMAIL_FORMAT = "INVALID_EMAIL_FORMAT";
     public static final String INVALID_ATTRIBUTES = "INVALID_ATTRIBUTES";
     public static final String USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS";
+    public static final String DOMAIN_NAME_EXISTS = "DOMAIN_NAME_ALREADY_EXISTS";
 
 }
