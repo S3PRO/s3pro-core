@@ -3,6 +3,7 @@ package com.s3procore.core.security;
 import com.google.common.collect.ObjectArrays;
 import com.s3procore.core.security.util.DefaultProfileUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -36,6 +39,9 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
     private final AuthenticationFilter authenticationFilter;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
 
     private static final String[] SWAGGER_PATHS = {
             // -- swagger ui
@@ -147,5 +153,10 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public AuthenticationSecurityInterceptor authenticationSecurityInterceptor() {
         return new AuthenticationSecurityInterceptor();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return JwtDecoders.fromIssuerLocation(issuerUri);
     }
 }
