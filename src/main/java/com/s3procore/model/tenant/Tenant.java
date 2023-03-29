@@ -11,9 +11,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -22,6 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Getter
@@ -44,11 +42,9 @@ public class Tenant {
     @Enumerated(EnumType.STRING)
     private EnvironmentTenant environment;
 
-    @ManyToMany (cascade = CascadeType.ALL)
-    @JoinTable(name = "tenant_user",
-            joinColumns = @JoinColumn(name = "tenant_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TenantUser> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "tenant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Document> documents = new ArrayList<>();
@@ -56,13 +52,24 @@ public class Tenant {
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Application> applications = new ArrayList<>();
 
-    public void addUser(User user){
-        this.users.add(user);
-        user.getTenants().add(this);
-    }
-    public void removeUser(User user){
-        this.users.remove(user);
-        user.getTenants().remove(this);
+    public void addUser(User user) {
+        TenantUser tenantUser = new TenantUser(this, user);
+        users.add(tenantUser);
+        user.getTenants().add(tenantUser);
     }
 
+    public void removeUser(User user) {
+        for (Iterator<TenantUser> iterator = users.iterator();
+             iterator.hasNext(); ) {
+            TenantUser tenantUser = iterator.next();
+
+            if (tenantUser.getTenant().equals(this) &&
+                    tenantUser.getUser().equals(user)) {
+                iterator.remove();
+                tenantUser.getUser().getTenants().remove(tenantUser);
+                tenantUser.setUser(null);
+                tenantUser.setTenant(null);
+            }
+        }
+    }
 }

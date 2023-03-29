@@ -1,11 +1,12 @@
 package com.s3procore.model.user;
 
-import com.s3procore.model.tenant.Tenant;
+import com.s3procore.model.tenant.TenantUser;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,7 +41,7 @@ public class User {
 
     private String subId;
 
-    @ManyToMany(mappedBy = "users")
-    private List<Tenant> tenants = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TenantUser> tenants = new ArrayList<>();
 
 }

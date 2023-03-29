@@ -17,7 +17,7 @@ public interface TenantRepository extends JpaRepository<Tenant, Long> {
 
     Optional<Tenant> findByDomainName(String domainName);
 
-    @Query("select t from Tenant t join t.users u where t.domainName = :domainName and u.subId = :subId")
+    @Query("select t from Tenant t join t.users u where t.domainName = :domainName and u.user.subId = :subId")
     Optional<Tenant> findByDomainNameAndUserSub(@Param("domainName") String domainName,
                                                 @Param("subId") String subId);
 

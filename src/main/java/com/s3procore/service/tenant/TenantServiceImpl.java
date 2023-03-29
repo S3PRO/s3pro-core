@@ -118,10 +118,6 @@ public class TenantServiceImpl implements TenantService {
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException(id, Tenant.class));
 
-       for (User user : tenant.getUsers()) {
-           tenant.removeUser(user);
-       }
-
         tenantRepository.delete(tenant);
     }
 
