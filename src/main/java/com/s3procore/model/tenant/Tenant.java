@@ -4,6 +4,7 @@ import com.s3procore.model.Document;
 import com.s3procore.model.application.Application;
 import com.s3procore.model.user.User;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,6 +35,7 @@ public class Tenant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique=true)
     private String domainName;
 
     @Enumerated(EnumType.STRING)

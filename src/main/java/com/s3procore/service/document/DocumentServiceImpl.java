@@ -31,7 +31,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         AuthenticationDetailsDto authenticationDetails = authenticationHelper.getAuthenticationDetailsByDomainName(domainName);
 
-        Tenant tenant = tenantRepository.findById(authenticationDetails.getTenantId())
+        Tenant tenant = tenantRepository.findByDomainName(domainName)
                 .orElseThrow(() -> new RelatedObjectNotFoundException(domainName, Tenant.class));
 
         documentDto.setId(null);

@@ -1,6 +1,5 @@
 package com.s3procore.web;
 
-import com.s3procore.core.security.AuthenticationHelper;
 import com.s3procore.dto.user.CreateUpdateUserDto;
 import com.s3procore.dto.user.UserDto;
 import com.s3procore.service.user.UserService;
@@ -17,18 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
-    private final AuthenticationHelper authenticationHelper;
 
     @PostMapping
     @SecurityRequirements
     public UserDto create(@RequestBody CreateUpdateUserDto userDto) {
         return userService.create(userDto);
     }
-
-//    @GetMapping
-//    public AuthenticationDetailsDto getUser() {
-//        AuthenticationDetailsDto authenticationDetails = authenticationHelper.getAuthenticationDetails();
-//        return authenticationDetails;
-//    }
 
 }
