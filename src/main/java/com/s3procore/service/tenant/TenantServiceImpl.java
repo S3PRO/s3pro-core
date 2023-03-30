@@ -120,4 +120,5 @@ public class TenantServiceImpl implements TenantService {
 
         tenantRepository.delete(tenant);
     }
+
 }
